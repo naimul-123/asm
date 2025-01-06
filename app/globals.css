@@ -2,20 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+.header {
+  @apply p-10 font-bold text-xl
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.card {
+  @apply p-10 bg-[#e6f4ed] text-[#007f40] text-center flex flex-col items-center shadow-lg
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+.card:hover {
+  @apply border-t-2 border-r-2 border-[#007f40]
+}
+
+.card h2 {
+  @apply text-2xl font-bold
 }
