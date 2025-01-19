@@ -1,5 +1,5 @@
 "use client"
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getData } from "@/lib/api"
 import { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -40,7 +40,6 @@ const UpdateLocation = () => {
     function onSubmit(data: z.infer<typeof FormSchema>) {
         setAssetNo(data.assetNo);
     }
-    console.log(asset);
 
 
     return (
@@ -69,32 +68,33 @@ const UpdateLocation = () => {
                     <Button type="submit">Search</Button>
                 </form>
             </Form>
+            {!isLoading &&
+                <div className="overflow-x-auto">
+                    <table className="table">
+                        {/* head */}
+                        <thead>
+                            <tr>
 
-            <div className="overflow-x-auto">
-                <table className="table">
-                    {/* head */}
-                    <thead>
-                        <tr>
+                                <th>Asset Number</th>
+                                <th>Asset Class</th>
+                                <th>Asset Name</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {/* row 1 */}
+                            <tr>
+                                <th>{asset?.AssetNumber}</th>
+                                <th>{asset?.categoryName}</th>
+                                <th>{asset?.subCategoryName}</th>
+                                <th><span className='btn btn-sm'>Add</span></th>
 
-                            <th>Asset Number</th>
-                            <th>Asset Class</th>
-                            <th>Asset Name</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {/* row 1 */}
-                        <tr>
-                            <th>{asset?.AssetNumber}</th>
-                            <th>{asset?.categoryName}</th>
-                            <th>{asset?.subCategoryName}</th>
-                            <th><span className='btn btn-sm'>Add</span></th>
+                            </tr>
 
-                        </tr>
-
-                    </tbody>
-                </table>
-            </div>
+                        </tbody>
+                    </table>
+                </div>
+            }
         </div>
     )
 }

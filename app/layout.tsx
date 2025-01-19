@@ -8,7 +8,7 @@ import { useState } from "react";
 import { AuthProvider } from "@/contexts/authContext";
 import { AssetProvider } from "@/contexts/assetContext";
 import Navbar from "@/components/header/Navbar";
-import ProtectedRoute from "@/components/ProtectedRoute";
+
 
 
 
@@ -28,17 +28,17 @@ export default function RootLayout({
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
             <AssetProvider>
-              <ProtectedRoute>
-                <div className="bg-[#e6f4ed] text-[#007f40] min-h-screen ">
-                  <Header />
-                  <Navbar />
-                  <main className="">
-                    {children}
-                  </main>
-                  <footer >
-                  </footer>
-                </div>
-              </ProtectedRoute>
+
+              <div className="bg-[#e6f4ed] text-[#007f40] min-h-screen ">
+                <Header />
+                <Navbar />
+                <main className="">
+                  {children}
+                </main>
+                <footer >
+                </footer>
+              </div>
+
             </AssetProvider>
           </AuthProvider>
         </QueryClientProvider>

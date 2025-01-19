@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/authContext'
 import * as React from "react"
 
 import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
@@ -25,8 +25,15 @@ const formSchema = z.object({
     department: z.string().nonempty("Please select a department."),
     section: z.string().nonempty("Please select a section."),
 });
+
+interface UserUpdate {
+    sap: number | null;
+    department: string;
+    section: string;
+
+}
 const UserInfo = () => {
-    const { user, profilemutation, isOpenModal, logout } = useAuth();
+    const { user, profileMutation, isOpenModal, logout } = useAuth();
     const [sections, setSections] = useState<string[] | undefined>([]);
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -38,19 +45,19 @@ const UserInfo = () => {
 
     const departments: string[] = departmentData.map(d => d.name);
 
-    const handleDeptChange = (value) => {
+    const handleDeptChange = (value: string) => {
         const sections = departmentData.find(d => d.name === value)?.sections;
         setSections(sections);
 
     }
     const handleSubmit = (data: z.infer<typeof formSchema>) => {
 
-        const updateUser = {
-            sap: user?.sap,
+        const updateUser: UserUpdate = {
+            sap: user?.sap || null,
             ...data
 
         }
-        profilemutation.mutate(updateUser);
+        profileMutation.mutate(updateUser);
 
         form.reset({
             department: "",

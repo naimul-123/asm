@@ -1,18 +1,16 @@
 "use client"
 import AssetEntryForm from '@/components/forms/AssetEntryForm'
 import { Button } from '@/components/ui/button'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableHead,
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
 import { MdDeleteForever } from "react-icons/md";
-import { useAuth } from '@/contexts/authContext'
 import { useAssetContext } from '@/contexts/assetContext'
 import Swal from 'sweetalert2'
 import ProtectedRoute from '@/components/ProtectedRoute'
@@ -23,25 +21,31 @@ interface AssetLocation {
     location: string
 }
 interface Asset {
-    assetNumber: string;
-    categoryName: string;
-    subCategoryName: string;
-    assetName: string;
+    hasnoAssetNo: boolean,
+    categoryName: string,
+    subCategoryName: string,
+    location: string,
+    assetName: string,
+    assetNumber: string,
+    department: string,
+    section: string
     assetLocation: AssetLocation;
 }
 
 
 
 const AssetEntry: React.FC = () => {
-    const { assetMutation, assetData, setAssetData, selectedDepartment, setSelectedDepartment, selectedSection, setSelectedSection } = useAssetContext();
+    const { assetMutation, assetData, setAssetData } = useAssetContext();
 
     useEffect(() => {
-        const localAsset: Asset[] = JSON.parse(localStorage.getItem('assetData')) || [];
+        const localAssetData = localStorage.getItem('assetData');
+        const localAsset: Asset[] = localAssetData ? JSON.parse(localAssetData) : [];
         setAssetData(localAsset)
     }, [setAssetData])
     const getFormData = (val: Asset): void => {
 
-        const localAsset: Asset[] = JSON.parse(localStorage.getItem('assetData')) || []
+        const localAssetData = localStorage.getItem('assetData');
+        const localAsset: Asset[] = localAssetData ? JSON.parse(localAssetData) : [];
         const isExist = localAsset?.find(asset => asset.assetNumber === val.assetNumber)
         if (isExist) {
             alert("This asset already added to list of this section")
@@ -55,8 +59,9 @@ const AssetEntry: React.FC = () => {
 
     type HandleRemove = (assetNum: string) => void
     const handleRemove: HandleRemove = (assetNum) => {
-        const localAsset = JSON.parse(localStorage.getItem('assetData'));
-        const remainingList: Asset[] = localAsset?.filter(asset => asset.assetNumber !== assetNum)
+        const localAssetData = localStorage.getItem('assetData');
+        const localAsset: Asset[] = localAssetData ? JSON.parse(localAssetData) : [];
+        const remainingList: Asset[] = localAsset?.filter((asset: Asset) => asset.assetNumber !== assetNum)
         localStorage.setItem("assetData", JSON.stringify(remainingList))
         setAssetData(remainingList)
     }

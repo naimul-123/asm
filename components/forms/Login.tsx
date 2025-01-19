@@ -1,5 +1,5 @@
 "use client"
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getData } from "@/lib/api"
 import { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -11,7 +11,6 @@ import {
     FormControl,
     FormField,
     FormItem,
-    FormLabel,
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -26,7 +25,7 @@ const LogIn = () => {
 
     const [sap, setsap] = useState('');
 
-    const { data: employee = {}, isLoading } = useQuery({
+    const { data: employee = {} } = useQuery({
         queryKey: ['employee', sap],
         queryFn: () => getData(`/login/api/?sap=${sap}`)
     })

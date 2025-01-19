@@ -1,6 +1,6 @@
 "use client"
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { getData } from "@/lib/api"
+import { useQuery } from '@tanstack/react-query';
+
 import { useState } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -16,7 +16,7 @@ import {
 import {
     Table,
     TableBody,
-    TableCaption,
+
     TableCell,
     TableHead,
     TableHeader,
@@ -37,6 +37,7 @@ interface Asset {
     subCategoryName: string;
     assetName: string;
     assetLocation: AssetLocation;
+    currentLocation: AssetLocation
 }
 const FormSchema = z.object({
     department: z.string().nonempty("Select a department."),
@@ -152,7 +153,7 @@ const ViewAssets = () => {
                             <TableCell colSpan={8}>Loading...</TableCell>
                         </TableRow>
                     )}
-                    {assetData.length > 0 ? assetData?.map((asset, idx) => {
+                    {assetData.length > 0 ? assetData?.map((asset: Asset, idx: number) => {
                         const { assetNumber, categoryName, subCategoryName, assetName, currentLocation } = asset;
                         const { department, section, location } = currentLocation
                         return (

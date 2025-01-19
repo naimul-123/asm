@@ -1,47 +1,56 @@
 "use client"
 
-import { getData, postData } from '@/lib/api';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
-import React, { createContext, useContext, useRef, useState } from 'react'
-interface User {
-    sap: number;
-    name: string;
-    designation: string;
-    department?: string;
-    section?: string;
-    cell?: string;
-    chember?: string
+import { postData } from '@/lib/api';
+import { useMutation, UseMutationResult } from '@tanstack/react-query';
+import axios, { AxiosResponse } from 'axios';
+import React, { createContext, Dispatch, SetStateAction, useContext, useState } from 'react';
+import Swal from 'sweetalert2';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, UseFormReturn } from 'react-hook-form';
+import { z } from 'zod';
+
+interface AssetLocation {
+    department: string;
+    section: string;
+    location: string;
 }
-import Swal from 'sweetalert2'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-interface AssetContextType {
 
-
-    setAssetData: () => void;
-    setSelectedDepartment: () => void;
-    setSelectedSection: () => void;
-    selectedDepartment: string;
-    selectedSection: string;
-    form: () => void;
+interface Asset {
     hasnoAssetNo: boolean;
-    setHasnoAssetNo: () => void;
-    handleHasAsset: () => void;
-    getAssetData: () => void;
+    categoryName: string;
+    subCategoryName: string;
+    location: string;
+    assetName: string;
+    assetNumber: string;
+    department: string;
+    section: string;
+    assetLocation: AssetLocation;
 }
 
-const AssetContext = createContext<AssetContextType | undefined>(undefined);
-export const AssetProvider = ({ children }: Readonly<{
-    children: React.ReactNode;
-}>) => {
-    const [assetData, setAssetData] = useState<Asset[]>([])
-    const [selectedDepartment, setSelectedDepartment] = useState<string>();
-    const [selectedSection, setSelectedSection] = useState<string>();
+interface AssetContextType {
+    setAssetData: Dispatch<SetStateAction<Asset[]>>;
+    setSelectedDepartment: Dispatch<SetStateAction<string | null>>;
+    setSelectedSection: Dispatch<SetStateAction<string | null>>;
+    selectedDepartment: string | null;
+    selectedSection: string | null;
+    form: UseFormReturn<z.ZodSchema<Asset>>;
+    hasnoAssetNo: boolean;
+    setHasnoAssetNo: Dispatch<SetStateAction<boolean>>;
+    handleHasAsset: (v: boolean) => void;
+    getAssetData: () => void;
+    assetMutation: UseMutationResult<AxiosResponse, Error, Asset>;
+    assetData: Asset[];
+    formSchema: z.ZodSchema<Asset>;
+}
+
+const AssetContext = createContext<AssetContextType | null>(null);
+
+export const AssetProvider = ({ children }: { children: React.ReactNode }) => {
+    const [assetData, setAssetData] = useState<Asset[]>([]);
+    const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
+    const [selectedSection, setSelectedSection] = useState<string | null>(null);
     const [hasnoAssetNo, setHasnoAssetNo] = useState<boolean>(false);
+
     const formSchema = z.object({
         hasnoAssetNo: z.boolean().default(false).optional(),
         assetNumber: z.string()
@@ -56,19 +65,18 @@ export const AssetProvider = ({ children }: Readonly<{
             ),
         categoryName: z.string()
             .nonempty("Please select a category.")
-            .refine((val) => hasnoAssetNo || val)
-        ,
+            .refine((val) => hasnoAssetNo || val),
         subCategoryName: z.string()
             .nonempty("Please select a sub category.")
-            .refine((val) => hasnoAssetNo || val)
-        ,
+            .refine((val) => hasnoAssetNo || val),
         assetName: z.string()
             .nonempty("Please write the asset name.")
             .refine((val) => hasnoAssetNo || val),
         location: z.string().nonempty("Asset location must not be inputed."),
         department: z.string().nonempty("Select a department."),
         section: z.string().nonempty("Select a section."),
-    })
+    });
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -80,9 +88,8 @@ export const AssetProvider = ({ children }: Readonly<{
             assetNumber: "",
             department: selectedDepartment || "",
             section: selectedSection || ""
-
         }
-    })
+    });
 
     const getAssetData = async () => {
         const assetNo = form.getValues('assetNumber');
@@ -96,15 +103,15 @@ export const AssetProvider = ({ children }: Readonly<{
             }
         }
     };
-    const assetMutation = useMutation({
-        mutationFn: async (data) => postData('/apis/assetInfo', data),
-        onSuccess: async (result) => {
 
+    const assetMutation: UseMutationResult<AxiosResponse, Error, Asset> = useMutation({
+        mutationFn: async (data: Asset) => postData('/apis/assetInfo', data),
+        onSuccess: async (result) => {
             if (result.data.success) {
-                localStorage.removeItem('assetData')
+                localStorage.removeItem('assetData');
                 setAssetData([]);
-                setSelectedDepartment('')
-                setSelectedSection('')
+                setSelectedDepartment(null);
+                setSelectedSection(null);
                 form.reset({
                     hasnoAssetNo: false,
                     categoryName: "",
@@ -114,7 +121,7 @@ export const AssetProvider = ({ children }: Readonly<{
                     location: "",
                     department: "",
                     section: ""
-                })
+                });
                 Swal.fire({
                     position: "top-end",
                     icon: "success",
@@ -122,20 +129,19 @@ export const AssetProvider = ({ children }: Readonly<{
                     showConfirmButton: false,
                     timer: 1500
                 });
-
             }
-
         },
         onError: (error) => {
             Swal.fire({
                 position: "top-end",
                 icon: "error",
-                title: error,
+                title: error.message,
                 showConfirmButton: false,
                 timer: 1500
             });
         }
     });
+
     const handleHasAsset = (v: boolean) => {
         setHasnoAssetNo(v);
         form.reset({
@@ -147,24 +153,36 @@ export const AssetProvider = ({ children }: Readonly<{
             location: "",
             department: selectedDepartment || "",
             section: selectedSection || ""
-        })
-    }
+        });
+    };
 
-    const assetInfo = { assetMutation, assetData, setAssetData, form, setSelectedDepartment, selectedDepartment, setSelectedSection, selectedSection, hasnoAssetNo, handleHasAsset, getAssetData }
-
+    const assetInfo = {
+        assetMutation,
+        assetData,
+        setAssetData,
+        form,
+        setSelectedDepartment,
+        selectedDepartment,
+        setSelectedSection,
+        selectedSection,
+        hasnoAssetNo,
+        setHasnoAssetNo,
+        handleHasAsset,
+        getAssetData,
+        formSchema
+    };
 
     return (
         <AssetContext.Provider value={assetInfo}>
             {children}
         </AssetContext.Provider>
-    )
-}
+    );
+};
 
 export const useAssetContext = () => {
-
-    const context = useContext(AssetContext)
+    const context = useContext(AssetContext);
     if (!context) {
-        throw new Error("UseAssetcontext must be used with an auth provider")
+        throw new Error("useAssetContext must be used within an AssetProvider");
     }
     return context;
-}
+};

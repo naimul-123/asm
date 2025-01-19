@@ -3,24 +3,23 @@ import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import categoryData from '@/public/category.json';
 import { Checkbox } from '../ui/checkbox'
-import { getData } from '@/lib/api'
 import departmentData from "@/public/departments.json"
 import { useAssetContext } from '@/contexts/assetContext'
 
+type AssetEntryFormProps = {
+    getFormData: (data: Record<string, any>) => void;
+};
 
-
-const AssetEntryForm = ({ getFormData }) => {
+const AssetEntryForm: React.FC<AssetEntryFormProps> = ({ getFormData }) => {
     const [sections, setSections] = useState<string[] | undefined>([]);
     const [categories, setCategories] = useState<string[]>([]);
     const [subCategories, setSubCategories] = useState<string[]>([]);
 
-    const { selectedDepartment, setSelectedDepartment, selectedSection, form, setSelectedSection, hasnoAssetNo, handleHasAsset, getAssetData } = useAssetContext();
+    const { selectedDepartment, setSelectedDepartment, selectedSection, form, setSelectedSection, hasnoAssetNo, handleHasAsset, getAssetData, formSchema } = useAssetContext();
 
 
 

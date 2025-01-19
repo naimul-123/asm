@@ -1,19 +1,19 @@
 "use client"
-import React, { useState } from 'react'
+import { useAuth } from '@/contexts/authContext';
 import { useEffect } from 'react';
 
 
-const ProtectedRoute = ({ children }) => {
-    const [user, setUser] = useState(null)
+const ProtectedRoute = ({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>) => {
+    const { user, getUser } = useAuth()
+    // 
+    console.log(user);
+
     useEffect(() => {
-        const getUser = async () => {
-            const res = await fetch("/apis/getUser")
-            if (res.ok) {
-                const data = await res.json();
-                setUser(data.payload)
-            }
-            else window.location.href = ('/login')
-        }
+
 
         getUser()
 
@@ -22,11 +22,9 @@ const ProtectedRoute = ({ children }) => {
 
 
 
-    return user ? (
-        <>{children}</>
-    ) : (
-        <p>Loading</p>
-    )
+    return <>
+        {children}
+    </>
 }
 
 export default ProtectedRoute

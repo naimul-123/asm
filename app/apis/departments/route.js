@@ -1,10 +1,9 @@
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
+
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-import { error } from "console";
+
 const secretKey = process.env.SECRET_KEY;
 
 

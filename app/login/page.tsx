@@ -2,7 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { Button } from "@/components/ui/button"
+
 import {
     Form,
     FormControl,
@@ -11,8 +11,8 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useAuth } from "@/contexts/authContext"
-import { useRouter } from "next/navigation"
+
+import { useRouter, useSearchParams } from "next/navigation"
 
 
 
@@ -24,7 +24,8 @@ const FormSchema = z.object({
 
 const LogIn = () => {
     const router = useRouter();
-    const redirect = router.query?.redirect || "/";
+    const searchParams = useSearchParams()
+    const redirect = searchParams.get('redirect') || "/";
     // const { loginmutation, loginError } = useAuth()
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Image from 'next/image'
 import logo from '@/public/bb_logo.png'
 import Link from 'next/link'
@@ -6,7 +6,7 @@ import { Button } from '../ui/button'
 import { useAuth } from '@/contexts/authContext'
 import { IoMdArrowDropdownCircle, IoMdArrowDropupCircle } from "react-icons/io";
 import UserInfo from './UserInfo'
-import Navbar from './Navbar'
+
 const Header = () => {
     const { user, isOpenModal, setIsOpemModal } = useAuth()
 
@@ -38,7 +38,6 @@ const Header = () => {
                                 <UserInfo />
                             </>
                         }
-
 
                     </div>
 
